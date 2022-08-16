@@ -33,15 +33,16 @@ const Search = ({onSearch, searchTerm}) => {
   );
 };
 
-const useSemiPersistentStorage = () => {
+const useSemiPersistentStorage = (key, initialState) => {
 
   const [value, setValue] = React.useState(
-    localStorage.getItem("value") || 'React'
+    localStorage.getItem(key) || initialState
   );
   
+  // Since the key comes from outside, the custom hook assumes that it could change, so it needs to be included in the dependency array of the useEffect hook. Without it, the side-effect may run with an outdated key (also called stale) if the key changed between renders.
   React.useEffect(() => {
-    localStorage.setItem("value", value);
-  }, [value])
+    localStorage.setItem(key, value);
+  }, [value, key])
 
   return [value, setValue];
 };
@@ -65,7 +66,7 @@ const App = () =>  {
       objectID: 1,
   } ];
 
-  const [searchTerm, setSearchTerm] = useSemiPersistentStorage();
+  const [searchTerm, setSearchTerm] = useSemiPersistentStorage("search", "React");
   
   const handleChange = (event) => {
     setSearchTerm(event.target.value); 
