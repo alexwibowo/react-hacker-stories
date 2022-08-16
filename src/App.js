@@ -9,13 +9,8 @@ const List = ({list, onRemoveItem}) =>
     <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
   );
 
-const Item = ({item, onRemoveItem}) => {
-  function handleRemoveItem() {
-    onRemoveItem(item);
-  }
-    
-  
-  return (
+const Item = ({item, onRemoveItem}) =>
+  (
     <div>
       <span>
         <a href={item.url}>{item.title}</a>
@@ -24,13 +19,18 @@ const Item = ({item, onRemoveItem}) => {
       <span>{item.num_comments}</span>
       <span>{item.points}</span>
       <span>
-        <button type="button" onClick={handleRemoveItem}>
+        <button type="button" 
+          onClick={() => {
+            
+            onRemoveItem(item);
+          
+          
+          }}>
           Dismiss
         </button>
       </span>
     </div>
   );
-};
 
 const InputWithLabel = ({id, type="text", value, isFocused, onInputChange, children}) => {
 
