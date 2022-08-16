@@ -8,8 +8,8 @@ const title="React";
 
 
 const List = (props) => 
-  props.list.map(item => 
-    <Item key={item.objectID} {...item}/>
+  props.list.map( ({objectID, ...item}) => 
+    <Item key={objectID} {...item}/>
   );
 
 const Item = ({
