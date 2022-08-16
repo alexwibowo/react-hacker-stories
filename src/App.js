@@ -9,18 +9,15 @@ const title="React";
 
 const List = (props) => 
   props.list.map(item => 
-    <Item key={item.objectID} item={item}/>
+    <Item key={item.objectID} {...item}/>
   );
 
 const Item = ({
-    item : {
         url,
         title,
         author,
         num_comments,
         points
-      }
-  
     }) => (
     <div>
       <span>
