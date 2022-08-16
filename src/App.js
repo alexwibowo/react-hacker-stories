@@ -20,10 +20,10 @@ const Item = ({item}) => (
     </div>
 );
 
-const InputWithLabel = ({id, label, type="text", value, onInputChange}) => {
+const InputWithLabel = ({id, type="text", value, onInputChange, children}) => {
   return (
     <>
-      <label htmlFor={id}>{label}: </label>
+      <label htmlFor={id}>{children}</label>
       <input id={id} type={type} onChange={onInputChange}
         value={value}/>     
     </>
@@ -34,9 +34,10 @@ const Search = ({onSearch, searchTerm}) => {
   return (
       <>
         <InputWithLabel id="search"
-          label="Search"
           value={searchTerm}
-          onInputChange={onSearch}/>
+          onInputChange={onSearch}>
+            Search :
+          </InputWithLabel>
         <p>
           Searching for <strong>{searchTerm}</strong>.
         </p>
