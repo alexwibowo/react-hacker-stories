@@ -20,7 +20,7 @@ const Item = ({item}) => (
     </div>
 );
 
-const InputWithLabel = ({id, label, type, value, onInputChange}) => {
+const InputWithLabel = ({id, label, type="text", value, onInputChange}) => {
   return (
     <>
       <label htmlFor={id}>{label}: </label>
@@ -36,7 +36,6 @@ const Search = ({onSearch, searchTerm}) => {
         <InputWithLabel id="search"
           label="Search"
           value={searchTerm}
-          type="text"
           onInputChange={onSearch}/>
         <p>
           Searching for <strong>{searchTerm}</strong>.
