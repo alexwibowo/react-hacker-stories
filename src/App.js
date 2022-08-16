@@ -4,12 +4,18 @@ import React from 'react';
 
 const title="React";
 
-const List = (props) => 
-  props.list.map( (item) => 
-    <Item key={item.objectID} item={item}/>
+const List = ({list, onRemoveItem}) => 
+  list.map( (item) => 
+    <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
   );
 
-const Item = ({item}) => (
+const Item = ({item, onRemoveItem}) => {
+  function handleRemoveItem() {
+    onRemoveItem(item);
+  }
+    
+  
+  return (
     <div>
       <span>
         <a href={item.url}>{item.title}</a>
@@ -17,14 +23,33 @@ const Item = ({item}) => (
       <span>{item.author}</span>
       <span>{item.num_comments}</span>
       <span>{item.points}</span>
+      <span>
+        <button type="button" onClick={handleRemoveItem}>
+          Dismiss
+        </button>
+      </span>
     </div>
-);
+  );
+};
 
-const InputWithLabel = ({id, type="text", value, onInputChange, children}) => {
+const InputWithLabel = ({id, type="text", value, isFocused, onInputChange, children}) => {
+
+  const inputRef = React.useRef();
+
+  React.useEffect(function() {
+    if (isFocused && inputRef.current){
+      inputRef.current.focus();
+    }
+
+  }, [isFocused]);
+
+
   return (
     <>
       <label htmlFor={id}>{children}</label>
-      <input id={id} type={type} onChange={onInputChange}
+      <input id={id} type={type} 
+        ref={inputRef}
+        onChange={onInputChange}
         value={value}/>     
     </>
   );
@@ -34,8 +59,15 @@ const Search = ({onSearch, searchTerm}) => {
   return (
       <>
         <InputWithLabel id="search"
-          value={searchTerm}
-          onInputChange={onSearch}>
+            value={searchTerm}
+            onInputChange={onSearch}>
+            Search :
+          </InputWithLabel>
+
+          <InputWithLabel id="search2"
+            value={searchTerm}
+            isFocused
+            onInputChange={onSearch}>
             Search :
           </InputWithLabel>
         <p>
@@ -61,7 +93,7 @@ const useSemiPersistentStorage = (key, initialState) => {
 
 
 const App = () =>  {
-  const stories = [
+  const initialStories = [
     {
       title: 'React',
       url: 'https://reactjs.org/',
@@ -79,10 +111,19 @@ const App = () =>  {
   } ];
 
   const [searchTerm, setSearchTerm] = useSemiPersistentStorage("search", "React");
+  const [stories, setStories] = React.useState(initialStories);
   
   const handleChange = (event) => {
     setSearchTerm(event.target.value); 
   };
+
+  const handleRemoveStory = (item) => {
+    const newStories = stories.filter(story =>  
+      story.objectID !== item.objectID
+    );
+    setStories(newStories);
+  };
+  
 
   const searchedStories = stories.filter((story) => 
       story.title
@@ -96,7 +137,7 @@ const App = () =>  {
 
       <Search onSearch={handleChange} searchTerm={searchTerm}/>     
       <hr/>
-      <List list={searchedStories}/>
+      <List list={searchedStories} onRemoveItem={handleRemoveStory}/>
     </div>
   );
 }
