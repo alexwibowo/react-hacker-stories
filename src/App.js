@@ -8,26 +8,40 @@ const title="React";
 
 
 const List = (props) => 
-  props.list.map((item) => 
-    <div key={item.objectID}>
-      <span>
-        <a href={item.url}>{item.title}</a>
-      </span>
-      <span>{item.author}</span>
-      <span>{item.num_comments}</span>
-      <span>{item.points}</span>
-    </div>
+  props.list.map(item => 
+    <Item key={item.objectID} item={item}/>
   );
 
-const Search = (props) => {
+const Item = ({
+    item : {
+        url,
+        title,
+        author,
+        num_comments,
+        points
+      }
+  
+    }) => (
+    <div>
+      <span>
+        <a href={url}>{title}</a>
+      </span>
+      <span>{author}</span>
+      <span>{num_comments}</span>
+      <span>{points}</span>
+    </div>
+);
+
+
+const Search = ({onSearch, searchTerm}) => {
   return (
       <>
         <label htmlFor='search'>Search: </label>
-        <input id="search" type="text" onChange={props.onSearch}
-          value={props.searchTerm}/>
+        <input id="search" type="text" onChange={onSearch}
+          value={searchTerm}/>
         
         <p>
-          Searching for <strong>{props.searchTerm}</strong>.
+          Searching for <strong>{searchTerm}</strong>.
         </p>
       </>
   );
