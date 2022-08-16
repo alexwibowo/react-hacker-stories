@@ -4,9 +4,6 @@ import React from 'react';
 
 const title="React";
 
-
-
-
 const List = (props) => 
   props.list.map( (item) => 
     <Item key={item.objectID} item={item}/>
@@ -23,20 +20,17 @@ const Item = ({item}) => (
     </div>
 );
 
-
 const Search = ({onSearch, searchTerm}) => {
   return (
       <>
         <label htmlFor='search'>Search: </label>
         <input id="search" type="text" onChange={onSearch}
-          value={searchTerm}/>
-        
+          value={searchTerm}/>        
         <p>
           Searching for <strong>{searchTerm}</strong>.
         </p>
       </>
   );
-
 };
 
 
@@ -58,10 +52,14 @@ const App = () =>  {
       objectID: 1,
   } ];
 
-  const [searchTerm, setSearchTerm] = React.useState('React');
+  const [searchTerm, setSearchTerm] = React.useState(
+    localStorage.getItem("search") || 'React'
+  );
 
   const handleChange = (event) => {
     setSearchTerm(event.target.value); 
+
+    localStorage.setItem("search", event.target.value);
   };
 
   const searchedStories = stories.filter((story) => 
