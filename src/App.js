@@ -137,14 +137,15 @@ const App = () => {
   // reducer function, receive two parameters - current state, and the action 
   // This will be the central place where we do our state management logic (based on the action type)
   const storiesReducer = function(state, action){
-    if (action.type === 'SET_STORIES') {
-      return action.payload;
-    } else if (action.type === "REMOVE_STORY") {
-      return state.filter(
-        (story) => story.objectID !== action.payload.objectID
-      );      
-    } else {
-      throw new Error()
+    switch (action.type){
+      case "SET_STORIES":
+        return action.payload;
+      case "REMOVE_STORY":
+        return state.filter(
+          (story) => story.objectID !== action.payload.objectID
+        );      
+      default:
+        throw new Error()
     }
   };
 
