@@ -120,11 +120,15 @@ const App = () => {
   ];
 
   const getAsyncStories = () =>  {
-    return Promise.resolve({ 
-      data: {
-        stories: initialStories
-      } 
-    });
+    return new Promise(resolve => {
+        setTimeout(function(){
+          resolve({
+            data: {
+              stories: initialStories
+            } 
+          })
+        }, 2000);
+    });    
   }
   
 
