@@ -174,22 +174,35 @@ const App = () => {
     // 4. because of re-rendering, handleFetchStories gets recreated... etc
     //
     // using useCallback, a new function will only get recreated if the dependency change.
-  const handleFetchStories = React.useCallback(() => {
+
+    // To use async/await, our function requires the async keyword. Once you start using the await keyword,
+    // everything reads like synchronous code. Actions after the await keyword are not executed until promise resolves,
+    // meaning the code will wait.
+  const handleFetchStories = React.useCallback(async () => {
       // send an action that indicates we are fetching something
       dispatchStories({type: "STORIES_FETCH_INIT"});
 
-      // 1. use javascript Template Literal for string interpolation
-      // 2. use browser's native fetch to get
-      axios.get(url)
-          .then(result => {
-              dispatchStories({
-                  type: 'STORIES_FETCH_SUCCESS',
-                  payload: result.data.hits
-              });
-          })
-          .catch(() => {
-              dispatchStories({type: "STORIES_FETCH_FAILURE"});
+      try {
+          const result = await axios.get(url);
+          dispatchStories({
+              type: 'STORIES_FETCH_SUCCESS',
+              payload: result.data.hits
           });
+      } catch  {
+          dispatchStories({ type: 'STORIES_FETCH_FAILURE' });
+      }
+
+      // alternatively, use browser's native fetch to get
+      /* axios.get(url)
+             .then(result => {
+                 dispatchStories({
+                     type: 'STORIES_FETCH_SUCCESS',
+                     payload: result.data.hits
+                 });
+             })
+             .catch(() => {
+                 dispatchStories({type: "STORIES_FETCH_FAILURE"});
+             });*/
   },[url]);
 
 
