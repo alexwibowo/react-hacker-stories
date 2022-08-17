@@ -66,7 +66,7 @@ const InputWithLabel = ({
   );
 };
 
-const Search = ({onSearchChange, searchTerm, onSubmit}) => {
+const SearchForm = ({onSearchChange, searchTerm, onSubmit}) => {
   return (
       <form onSubmit={onSubmit}>
         <InputWithLabel id="search"
@@ -223,15 +223,18 @@ const App = () => {
     });
   };
 
-  const handleSearchSubmit = () => {
+  const handleSearchSubmit = (event) => {
       setUrl(`${API_ENDPOINT}${searchTerm}`);
+      // this is to prevent browser from reloading when you submit the form.
+      // you can see this when there are multiple requests in the developer console
+      event.preventDefault();
   };
 
   return (
     <div>
       <h1>Hello {title}</h1>
 
-      <Search onSearchChange={handleChangeSearchTerm} searchTerm={searchTerm} onSubmit={handleSearchSubmit} />
+      <SearchForm onSearchChange={handleChangeSearchTerm} searchTerm={searchTerm} onSubmit={handleSearchSubmit} />
       <hr />
 
       { /* In JavaScript, a true && 'Hello World' always evaluates to ‘Hello World’. A false && 'Hello World' always evaluates to false. In React, we can use this behaviour to our advantage. If the condition is true, the expression after the logical && operator will be the output. If the condition is false, React ignores it and skips the expression. */}
