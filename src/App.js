@@ -134,10 +134,13 @@ const App = () => {
     "React"
   );
   const [stories, setStories] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   React.useEffect(function(){
+    setIsLoading(true);
     getAsyncStories().then(function(result) {
-      setStories(result.data.stories)
+      setStories(result.data.stories);
+      setIsLoading(false);
     });
   }, []);
 
@@ -164,7 +167,14 @@ const App = () => {
 
       <Search onSearch={handleChangeSearchTerm} searchTerm={searchTerm} />
       <hr />
-      <List list={searchedStories} onRemoveItem={handleRemoveStory} />
+
+      {
+        isLoading? (
+          <p>Loading...</p>
+        ) : (
+          <List list={searchedStories} onRemoveItem={handleRemoveStory} />
+        )
+      }
     </div>
   );
 };
