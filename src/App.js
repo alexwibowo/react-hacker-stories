@@ -68,7 +68,7 @@ const InputWithLabel = ({
 
 const Search = ({onSearchChange, searchTerm, onSubmit}) => {
   return (
-      <>
+      <form onSubmit={onSubmit}>
         <InputWithLabel id="search"
           value={searchTerm}
           isFocused
@@ -79,8 +79,8 @@ const Search = ({onSearchChange, searchTerm, onSubmit}) => {
         <p>
           Searching for <strong>{searchTerm}</strong>.
         </p>
-          <button type="button"  onClick={onSubmit}>Submit</button>
-      </>
+          <button type="submit" disabled={!searchTerm}>Submit</button>
+      </form>
   );
 };
 
