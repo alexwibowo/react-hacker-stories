@@ -1,6 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import React from 'react';
+import axios from 'axios';
 
 const title="React";
 
@@ -179,12 +180,11 @@ const App = () => {
 
       // 1. use javascript Template Literal for string interpolation
       // 2. use browser's native fetch to get
-      fetch(url)
-          .then(response => response.json())
+      axios.get(url)
           .then(result => {
               dispatchStories({
                   type: 'STORIES_FETCH_SUCCESS',
-                  payload: result.hits
+                  payload: result.data.hits
               });
           })
           .catch(() => {
