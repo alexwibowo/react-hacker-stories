@@ -133,7 +133,23 @@ const App = () => {
     "search",
     "React"
   );
-  const [stories, setStories] = React.useState([]);
+ 
+  // reducer function, receive two parameters - current state, and the action 
+  // This will be the central place where we do our state management logic (based on the action type)
+  const storiesReducer = function(state, action){
+    if (action.type === 'SET_STORIES') {
+      return action.payload;
+    } else {
+      throw new Error()
+    }
+  };
+
+  // first parameter is the reducer function, and second parameter is the initial state 
+  // the value returned is the 'current state' that we can bind as usual, and the second 
+  // is the state updater function (dispatch function)
+  // Instead of doing set* when we use useState, we dispatch action to the reducer function.
+  const [stories, dispatchStories] = React.useReducer(storiesReducer, []);
+
   const [isLoading, setIsLoading] = React.useState(false);
   const [isError, setIsError] = React.useState(false);
 
@@ -141,7 +157,10 @@ const App = () => {
     setIsLoading(true);
     getAsyncStories()
     .then(function(result) {
-      setStories(result.data.stories);
+      dispatchStories({
+        type: 'SET_STORIES',
+        payload: result.data.stories
+      });
       setIsLoading(false);
     })
     .catch(() => {
@@ -157,7 +176,10 @@ const App = () => {
     const newStories = stories.filter(
       (story) => story.objectID !== item.objectID
     );
-    setStories(newStories);
+    dispatchStories({
+      type: 'SET_STORIES',
+      payload: newStories 
+    });
   };
 
   // this is interesting.. React knows that there is a dependency between 'searchedStories' and 'searchTerm'.
