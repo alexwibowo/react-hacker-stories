@@ -119,17 +119,13 @@ const App = () => {
     },
   ];
 
-  const getAsyncStories = () =>  {
-    return new Promise(resolve => {
-        setTimeout(function(){
-          resolve({
-            data: {
-              stories: initialStories
-            } 
-          })
-        }, 2000);
-    });    
-  }
+  const getAsyncStories = () =>  
+    new Promise(resolve => {
+        setTimeout(
+          () => resolve({ data: {stories: initialStories} }), 
+          2000
+        );
+    });
   
 
   // we use semi persistent storage to remember what use has searched
