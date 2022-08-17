@@ -101,33 +101,6 @@ const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
 
 // Main application
 const App = () => {
-  const initialStories = [
-    {
-      title: "React",
-      url: "https://reactjs.org/",
-      author: "Jordan Walke",
-      num_comments: 3,
-      points: 4,
-      objectID: 0,
-    },
-    {
-      title: "Redux",
-      url: "https://redux.js.org/",
-      author: "Dan Abramov, Andrew Clark",
-      num_comments: 2,
-      points: 5,
-      objectID: 1,
-    },
-  ];
-
-  const getAsyncStories = () =>
-    new Promise( (resolve, reject)  => {
-        setTimeout(
-          () => resolve({ data: {stories: initialStories} }),
-          2000
-        );
-    });
-
 
   // we use semi persistent storage to remember what use has searched
   const [searchTerm, setSearchTerm] = useSemiPersistentStorage(
@@ -183,12 +156,15 @@ const App = () => {
 
 
   React.useEffect(function(){
+      // dont perform search if it is empty
+      if (searchTerm === "") return;
+
     // send an action that indicates we are fetching something
     dispatchStories({type: "STORIES_FETCH_INIT"});
 
     // 1. use javascript Template Literal for string interpolation
       // 2. use browser's native fetch to get
-    fetch(`${API_ENDPOINT}react`)
+    fetch(`${API_ENDPOINT}${searchTerm}`)
         .then(response => response.json())
         .then(result => {
           dispatchStories({
@@ -200,17 +176,7 @@ const App = () => {
           dispatchStories({type: "STORIES_FETCH_FAILURE"});
         });
 
-  /*  getAsyncStories()
-    .then(function(result) {
-      dispatchStories({
-        type: 'STORIES_FETCH_SUCCESS',
-        payload: result.data.stories
-      });
-    })
-    .catch(() => {
-      dispatchStories({type: "STORIES_FETCH_FAILURE"});
-    });*/
-  }, []);
+  }, [searchTerm]);
 
   const handleChangeSearchTerm = (event) => {
     setSearchTerm(event.target.value);
@@ -223,12 +189,6 @@ const App = () => {
       payload: item
     });
   };
-
-  // this is interesting.. React knows that there is a dependency between 'searchedStories' and 'searchTerm'.
-  // i.e. when searchTerm changed, this snippet is re-evaluated ?
-  const searchedStories = stories.data.filter((story) =>
-    story.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <div>
@@ -243,7 +203,7 @@ const App = () => {
         stories.isLoading? (
           <p>Loading...</p>
         ) : (
-          <List list={searchedStories} onRemoveItem={handleRemoveStory} />
+          <List list={stories.data} onRemoveItem={handleRemoveStory} />
         )
       }
     </div>
