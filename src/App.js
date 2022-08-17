@@ -139,6 +139,10 @@ const App = () => {
   const storiesReducer = function(state, action){
     if (action.type === 'SET_STORIES') {
       return action.payload;
+    } else if (action.type === "REMOVE_STORY") {
+      return state.filter(
+        (story) => story.objectID !== action.payload.objectID
+      );      
     } else {
       throw new Error()
     }
@@ -173,12 +177,10 @@ const App = () => {
   };
 
   const handleRemoveStory = (item) => {
-    const newStories = stories.filter(
-      (story) => story.objectID !== item.objectID
-    );
+   
     dispatchStories({
-      type: 'SET_STORIES',
-      payload: newStories 
+      type: 'REMOVE_STORY',
+      payload: item 
     });
   };
 
