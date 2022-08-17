@@ -119,12 +119,27 @@ const App = () => {
     },
   ];
 
+  const getAsyncStories = () =>  {
+    return Promise.resolve({ 
+      data: {
+        stories: initialStories
+      } 
+    });
+  }
+  
+
   // we use semi persistent storage to remember what use has searched
   const [searchTerm, setSearchTerm] = useSemiPersistentStorage(
     "search",
     "React"
   );
-  const [stories, setStories] = React.useState(initialStories);
+  const [stories, setStories] = React.useState([]);
+
+  React.useEffect(function(){
+    getAsyncStories().then(function(result) {
+      setStories(result.data.stories)
+    });
+  }, []);
 
   const handleChangeSearchTerm = (event) => {
     setSearchTerm(event.target.value);
