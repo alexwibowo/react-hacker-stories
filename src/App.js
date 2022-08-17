@@ -154,29 +154,45 @@ const App = () => {
     isError: false
   });
 
+  // here we are extracting out the search function so that we can use it elsewhere if we need to
+    // Our 'handleFetchStories' depends on 'searchTerm', but we dont want the function to be recreated
+    // on every refresh. Hence we memoize it here using 'useCallback'.
+    // This useCallback creates a memoized function every time its dependency array ([searchTerm]) changes.
+    // Because searchTerm changes, handleFetchStories gets recreated. Because handleFetchStories gets recreated,
+    // React.useEffect that depends on handleFetchStories function gets called.
+    // without 'useCallback', we will run into endless loop:
+    // 1. we define handleFetchStories
+    // 2. side-effect, so React.useEffect(...,[handleFetchStories]) runs
+    // 3. because it runs, we update the state, which re-render component
+    // 4. because of re-rendering, handleFetchStories gets recreated... etc
+    //
+    // using useCallback, a new function will only get recreated if the dependency change.
+  const handleFetchStories = React.useCallback(() => {
+      if (searchTerm === "") return;
+
+      // send an action that indicates we are fetching something
+      dispatchStories({type: "STORIES_FETCH_INIT"});
+
+      // 1. use javascript Template Literal for string interpolation
+      // 2. use browser's native fetch to get
+      fetch(`${API_ENDPOINT}${searchTerm}`)
+          .then(response => response.json())
+          .then(result => {
+              dispatchStories({
+                  type: 'STORIES_FETCH_SUCCESS',
+                  payload: result.hits
+              });
+          })
+          .catch(() => {
+              dispatchStories({type: "STORIES_FETCH_FAILURE"});
+          });
+  },[searchTerm]);
+
 
   React.useEffect(function(){
       // dont perform search if it is empty
-      if (searchTerm === "") return;
-
-    // send an action that indicates we are fetching something
-    dispatchStories({type: "STORIES_FETCH_INIT"});
-
-    // 1. use javascript Template Literal for string interpolation
-      // 2. use browser's native fetch to get
-    fetch(`${API_ENDPOINT}${searchTerm}`)
-        .then(response => response.json())
-        .then(result => {
-          dispatchStories({
-            type: 'STORIES_FETCH_SUCCESS',
-            payload: result.hits
-          });
-        })
-        .catch(() => {
-          dispatchStories({type: "STORIES_FETCH_FAILURE"});
-        });
-
-  }, [searchTerm]);
+      handleFetchStories()
+  }, [handleFetchStories]);
 
   const handleChangeSearchTerm = (event) => {
     setSearchTerm(event.target.value);
