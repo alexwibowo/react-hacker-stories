@@ -65,19 +65,20 @@ const InputWithLabel = ({
   );
 };
 
-const Search = ({onSearch, searchTerm}) => {
+const Search = ({onSearchChange, searchTerm, onSubmit}) => {
   return (
       <>
         <InputWithLabel id="search"
           value={searchTerm}
           isFocused
-          onInputChange={onSearch}>
+          onInputChange={onSearchChange}>
           Search :
         </InputWithLabel>
 
         <p>
           Searching for <strong>{searchTerm}</strong>.
         </p>
+          <button type="button"  onClick={onSubmit}>Submit</button>
       </>
   );
 };
@@ -108,7 +109,12 @@ const App = () => {
     "React"
   );
 
-  // reducer function, receive two parameters - current state, and the action 
+    const [url, setUrl] = React.useState(
+        `${API_ENDPOINT}${searchTerm}`
+    );
+
+
+    // reducer function, receive two parameters - current state, and the action
   // This will be the central place where we do our state management logic (based on the action type)
   // For every state transition, we return a new state object which contains all the key/value pairs from the current state object (via JavaScript’s spread operator) and the new overwriting properties. For example, STORIES_FETCH_FAILURE resets the isLoading, but sets the isError boolean flags yet keeps all the other state intact (e.g. stories). That’s how we get around the bug introduced earlier, since an error should remove the loading state.
   const storiesReducer = function(state, action){
@@ -154,11 +160,11 @@ const App = () => {
     isError: false
   });
 
-  // here we are extracting out the search function so that we can use it elsewhere if we need to
-    // Our 'handleFetchStories' depends on 'searchTerm', but we dont want the function to be recreated
+   // here we are extracting out the search function so that we can use it elsewhere if we need to
+    // Our 'handleFetchStories' depends on 'url', but we dont want the function to be recreated
     // on every refresh. Hence we memoize it here using 'useCallback'.
-    // This useCallback creates a memoized function every time its dependency array ([searchTerm]) changes.
-    // Because searchTerm changes, handleFetchStories gets recreated. Because handleFetchStories gets recreated,
+    // This useCallback creates a memoized function every time its dependency array ([url]) changes.
+    // Because url changes, handleFetchStories gets recreated. Because handleFetchStories gets recreated,
     // React.useEffect that depends on handleFetchStories function gets called.
     // without 'useCallback', we will run into endless loop:
     // 1. we define handleFetchStories
@@ -168,14 +174,12 @@ const App = () => {
     //
     // using useCallback, a new function will only get recreated if the dependency change.
   const handleFetchStories = React.useCallback(() => {
-      if (searchTerm === "") return;
-
       // send an action that indicates we are fetching something
       dispatchStories({type: "STORIES_FETCH_INIT"});
 
       // 1. use javascript Template Literal for string interpolation
       // 2. use browser's native fetch to get
-      fetch(`${API_ENDPOINT}${searchTerm}`)
+      fetch(url)
           .then(response => response.json())
           .then(result => {
               dispatchStories({
@@ -186,7 +190,7 @@ const App = () => {
           .catch(() => {
               dispatchStories({type: "STORIES_FETCH_FAILURE"});
           });
-  },[searchTerm]);
+  },[url]);
 
 
   React.useEffect(function(){
@@ -206,11 +210,15 @@ const App = () => {
     });
   };
 
+  const handleSearchSubmit = () => {
+      setUrl(`${API_ENDPOINT}${searchTerm}`);
+  };
+
   return (
     <div>
       <h1>Hello {title}</h1>
 
-      <Search onSearch={handleChangeSearchTerm} searchTerm={searchTerm} />
+      <Search onSearchChange={handleChangeSearchTerm} searchTerm={searchTerm} onSubmit={handleSearchSubmit} />
       <hr />
 
       { /* In JavaScript, a true && 'Hello World' always evaluates to ‘Hello World’. A false && 'Hello World' always evaluates to false. In React, we can use this behaviour to our advantage. If the condition is true, the expression after the logical && operator will be the output. If the condition is false, React ignores it and skips the expression. */}
