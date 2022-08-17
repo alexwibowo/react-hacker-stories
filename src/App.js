@@ -136,14 +136,35 @@ const App = () => {
  
   // reducer function, receive two parameters - current state, and the action 
   // This will be the central place where we do our state management logic (based on the action type)
+  // For every state transition, we return a new state object which contains all the key/value pairs from the current state object (via JavaScript’s spread operator) and the new overwriting properties. For example, STORIES_FETCH_FAILURE resets the isLoading, but sets the isError boolean flags yet keeps all the other state intact (e.g. stories). That’s how we get around the bug introduced earlier, since an error should remove the loading state.
   const storiesReducer = function(state, action){
     switch (action.type){
-      case "SET_STORIES":
-        return action.payload;
+      case "STORIES_FETCH_INIT":
+        return {
+            ...state,
+            isLoading: true,
+            isError: false
+        };
+      case "STORIES_FETCH_SUCCESS":
+        return {
+          ...state,
+          data: action.payload,
+          isLoading: false,
+          isError: false
+        };
       case "REMOVE_STORY":
-        return state.filter(
-          (story) => story.objectID !== action.payload.objectID
-        );      
+        return {
+          ...state,
+          data:  state.data.filter(
+            (story) => story.objectID !== action.payload.objectID
+          )
+        };   
+      case "STORIES_FETCH_FAILURE":
+        return {
+          ...state,
+          isLoading: false,
+          isError: true
+      };
       default:
         throw new Error()
     }
@@ -153,23 +174,24 @@ const App = () => {
   // the value returned is the 'current state' that we can bind as usual, and the second 
   // is the state updater function (dispatch function)
   // Instead of doing set* when we use useState, we dispatch action to the reducer function.
-  const [stories, dispatchStories] = React.useReducer(storiesReducer, []);
+  const [stories, dispatchStories] = React.useReducer(storiesReducer, {
+    data: [],
+    isLoading: false,
+    isError: false
+  });
 
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [isError, setIsError] = React.useState(false);
-
+  
   React.useEffect(function(){
-    setIsLoading(true);
+    dispatchStories({type: "STORIES_FETCH_INIT"});
     getAsyncStories()
     .then(function(result) {
       dispatchStories({
-        type: 'SET_STORIES',
+        type: 'STORIES_FETCH_SUCCESS',
         payload: result.data.stories
       });
-      setIsLoading(false);
     })
     .catch(() => {
-      setIsError(true);
+      dispatchStories({type: "STORIES_FETCH_FAILURE"});
     });
   }, []);
 
@@ -187,7 +209,7 @@ const App = () => {
 
   // this is interesting.. React knows that there is a dependency between 'searchedStories' and 'searchTerm'.
   // i.e. when searchTerm changed, this snippet is re-evaluated ?
-  const searchedStories = stories.filter((story) =>
+  const searchedStories = stories.data.filter((story) =>
     story.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -199,9 +221,9 @@ const App = () => {
       <hr />
 
       { /* In JavaScript, a true && 'Hello World' always evaluates to ‘Hello World’. A false && 'Hello World' always evaluates to false. In React, we can use this behaviour to our advantage. If the condition is true, the expression after the logical && operator will be the output. If the condition is false, React ignores it and skips the expression. */}
-      { isError && <p>Some terrible stuff has happened</p> }
+      { stories.isError && <p>Some terrible stuff has happened</p> }
       {
-        isLoading? (
+        stories.isLoading? (
           <p>Loading...</p>
         ) : (
           <List list={searchedStories} onRemoveItem={handleRemoveStory} />
