@@ -135,12 +135,17 @@ const App = () => {
   );
   const [stories, setStories] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isError, setIsError] = React.useState(false);
 
   React.useEffect(function(){
     setIsLoading(true);
-    getAsyncStories().then(function(result) {
+    getAsyncStories()
+    .then(function(result) {
       setStories(result.data.stories);
       setIsLoading(false);
+    })
+    .catch(() => {
+      setIsError(true);
     });
   }, []);
 
@@ -168,6 +173,8 @@ const App = () => {
       <Search onSearch={handleChangeSearchTerm} searchTerm={searchTerm} />
       <hr />
 
+      { /* In JavaScript, a true && 'Hello World' always evaluates to ‘Hello World’. A false && 'Hello World' always evaluates to false. In React, we can use this behaviour to our advantage. If the condition is true, the expression after the logical && operator will be the output. If the condition is false, React ignores it and skips the expression. */}
+      { isError && <p>Some terrible stuff has happened</p> }
       {
         isLoading? (
           <p>Loading...</p>
