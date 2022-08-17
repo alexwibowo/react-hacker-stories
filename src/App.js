@@ -88,7 +88,7 @@ const useSemiPersistentStorage = (key, initialState) => {
   const [value, setValue] = React.useState(
     localStorage.getItem(key) || initialState
   );
-  
+
   // Since the key comes from outside, the custom hook assumes that it could change, so it needs to be included in the dependency array of the useEffect hook. Without it, the side-effect may run with an outdated key (also called stale) if the key changed between renders.
   React.useEffect(() => {
     localStorage.setItem(key, value);
@@ -97,6 +97,7 @@ const useSemiPersistentStorage = (key, initialState) => {
   return [value, setValue];
 };
 
+const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
 
 // Main application
 const App = () => {
@@ -119,21 +120,21 @@ const App = () => {
     },
   ];
 
-  const getAsyncStories = () =>  
+  const getAsyncStories = () =>
     new Promise( (resolve, reject)  => {
         setTimeout(
-          () => resolve({ data: {stories: initialStories} }), 
+          () => resolve({ data: {stories: initialStories} }),
           2000
         );
     });
-  
+
 
   // we use semi persistent storage to remember what use has searched
   const [searchTerm, setSearchTerm] = useSemiPersistentStorage(
     "search",
     "React"
   );
- 
+
   // reducer function, receive two parameters - current state, and the action 
   // This will be the central place where we do our state management logic (based on the action type)
   // For every state transition, we return a new state object which contains all the key/value pairs from the current state object (via JavaScript’s spread operator) and the new overwriting properties. For example, STORIES_FETCH_FAILURE resets the isLoading, but sets the isError boolean flags yet keeps all the other state intact (e.g. stories). That’s how we get around the bug introduced earlier, since an error should remove the loading state.
@@ -158,7 +159,7 @@ const App = () => {
           data:  state.data.filter(
             (story) => story.objectID !== action.payload.objectID
           )
-        };   
+        };
       case "STORIES_FETCH_FAILURE":
         return {
           ...state,
@@ -180,10 +181,26 @@ const App = () => {
     isError: false
   });
 
-  
+
   React.useEffect(function(){
+    // send an action that indicates we are fetching something
     dispatchStories({type: "STORIES_FETCH_INIT"});
-    getAsyncStories()
+
+    // 1. use javascript Template Literal for string interpolation
+      // 2. use browser's native fetch to get
+    fetch(`${API_ENDPOINT}react`)
+        .then(response => response.json())
+        .then(result => {
+          dispatchStories({
+            type: 'STORIES_FETCH_SUCCESS',
+            payload: result.hits
+          });
+        })
+        .catch(() => {
+          dispatchStories({type: "STORIES_FETCH_FAILURE"});
+        });
+
+  /*  getAsyncStories()
     .then(function(result) {
       dispatchStories({
         type: 'STORIES_FETCH_SUCCESS',
@@ -192,7 +209,7 @@ const App = () => {
     })
     .catch(() => {
       dispatchStories({type: "STORIES_FETCH_FAILURE"});
-    });
+    });*/
   }, []);
 
   const handleChangeSearchTerm = (event) => {
@@ -200,10 +217,10 @@ const App = () => {
   };
 
   const handleRemoveStory = (item) => {
-   
+
     dispatchStories({
       type: 'REMOVE_STORY',
-      payload: item 
+      payload: item
     });
   };
 
