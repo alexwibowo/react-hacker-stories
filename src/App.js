@@ -11,20 +11,21 @@ const List = ({ list, onRemoveItem }) =>
   ));
 
 const Item = ({ item, onRemoveItem }) => (
-  <div>
-    <span>
+  <div className="item">
+    <span style={ { width: '40%'} }>
       <a href={item.url}>{item.title}</a>
     </span>
-    <span>{item.author}</span>
-    <span>{item.num_comments}</span>
-    <span>{item.points}</span>
-    <span>
+    <span style={ { width: '30%'} }>{item.author}</span>
+    <span style={ { width: '10%'} }>{item.num_comments}</span>
+    <span style={ { width: '10%'} }>{item.points}</span>
+    <span style={ { width: '10%'} }>
       {/* See how we are using inline handlers here. This is because we want to pass 'item' to the onRemoveItem method */}
       <button
         type="button"
         onClick={() => {
           onRemoveItem(item);
         }}
+        className="button button_small"
       >
         Dismiss
       </button>
@@ -54,13 +55,14 @@ const InputWithLabel = ({
 
   return (
     <>
-      <label htmlFor={id}>{children}</label>
+      <label htmlFor={id} className="label">{children}</label>
       <input
         id={id}
         type={type}
         ref={inputRef}
         onChange={onInputChange}
         value={value}
+        className="input"
       />
     </>
   );
@@ -100,18 +102,19 @@ class LegacyInputWithLabel extends React.Component {
 
 const SearchForm = ({onSearchChange, searchTerm, onSubmit}) => {
   return (
-      <form onSubmit={onSubmit}>
-        <LegacyInputWithLabel id="search"
+      <form onSubmit={onSubmit} className="search-form">
+        <InputWithLabel id="search"
           value={searchTerm}
           isFocused
           onInputChange={onSearchChange}>
           Search :
-        </LegacyInputWithLabel>
+        </InputWithLabel>
 
         <p>
           Searching for <strong>{searchTerm}</strong>.
         </p>
-          <button type="submit" disabled={!searchTerm}>Submit</button>
+          <button type="submit" disabled={!searchTerm}
+                  className="button button_large">Submit</button>
       </form>
   );
 };
