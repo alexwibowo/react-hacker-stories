@@ -1,5 +1,5 @@
 import logo from './logo.svg';
-import './App.css';
+import styles from './App.module.css';
 import React from 'react';
 import axios from 'axios';
 
@@ -11,7 +11,7 @@ const List = ({ list, onRemoveItem }) =>
   ));
 
 const Item = ({ item, onRemoveItem }) => (
-  <div className="item">
+  <div className={styles.item}>
     <span style={ { width: '40%'} }>
       <a href={item.url}>{item.title}</a>
     </span>
@@ -25,7 +25,7 @@ const Item = ({ item, onRemoveItem }) => (
         onClick={() => {
           onRemoveItem(item);
         }}
-        className="button button_small"
+        className={ `${styles.button} ${styles.buttonSmall}`}
       >
         Dismiss
       </button>
@@ -55,14 +55,14 @@ const InputWithLabel = ({
 
   return (
     <>
-      <label htmlFor={id} className="label">{children}</label>
+      <label htmlFor={id} className={styles.label}>{children}</label>
       <input
         id={id}
         type={type}
         ref={inputRef}
         onChange={onInputChange}
         value={value}
-        className="input"
+        className={styles.input}
       />
     </>
   );
@@ -102,7 +102,7 @@ class LegacyInputWithLabel extends React.Component {
 
 const SearchForm = ({onSearchChange, searchTerm, onSubmit}) => {
   return (
-      <form onSubmit={onSubmit} className="search-form">
+      <form onSubmit={onSubmit} className={ styles.searchForm}>
         <InputWithLabel id="search"
           value={searchTerm}
           isFocused
@@ -114,7 +114,7 @@ const SearchForm = ({onSearchChange, searchTerm, onSubmit}) => {
           Searching for <strong>{searchTerm}</strong>.
         </p>
           <button type="submit" disabled={!searchTerm}
-                  className="button button_large">Submit</button>
+                  className={  `${styles.button} ${styles.buttonLarge}`}>Submit</button>
       </form>
   );
 };
@@ -266,8 +266,8 @@ const App = () => {
   };
 
   return (
-    <div className="container">
-      <h1 className="headline-primary">Hello {title}</h1>
+    <div className={styles.container}>
+      <h1 className={styles.headlinePrimary}>Hello {title}</h1>
 
       <SearchForm onSearchChange={handleChangeSearchTerm} searchTerm={searchTerm} onSubmit={handleSearchSubmit} />
       <hr />
