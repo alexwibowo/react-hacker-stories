@@ -66,15 +66,47 @@ const InputWithLabel = ({
   );
 };
 
+// This is an example of InputLabel using legacy class component
+class LegacyInputWithLabel extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // notice that this uses createRef, the equivalent of useRef in function component
+        // class component uses createRef.
+        this.inputRef = React.createRef();
+    }
+
+    componentDidMount() {
+        if (this.props.isFocused){
+            this.inputRef.current.focus();
+        }
+    }
+
+    render() {
+        return (
+            <>
+                <label htmlFor={this.props.id}>{this.props.children}</label>
+                <input
+                    id={this.props.id}
+                    type={this.props.type}
+                    ref={this.inputRef}
+                    onChange={this.props.onInputChange}
+                    value={this.props.value}
+                />
+            </>
+        );
+    }
+}
+
 const SearchForm = ({onSearchChange, searchTerm, onSubmit}) => {
   return (
       <form onSubmit={onSubmit}>
-        <InputWithLabel id="search"
+        <LegacyInputWithLabel id="search"
           value={searchTerm}
           isFocused
           onInputChange={onSearchChange}>
           Search :
-        </InputWithLabel>
+        </LegacyInputWithLabel>
 
         <p>
           Searching for <strong>{searchTerm}</strong>.
@@ -231,8 +263,8 @@ const App = () => {
   };
 
   return (
-    <div>
-      <h1>Hello {title}</h1>
+    <div className="container">
+      <h1 className="headline-primary">Hello {title}</h1>
 
       <SearchForm onSearchChange={handleChangeSearchTerm} searchTerm={searchTerm} onSubmit={handleSearchSubmit} />
       <hr />
